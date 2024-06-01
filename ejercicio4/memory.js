@@ -1,3 +1,4 @@
+// Se solicita completar la implementación de la clase Card.
 class Card {
     constructor(name, img) {
         this.name = name;
@@ -31,8 +32,23 @@ class Card {
         const cardElement = this.element.querySelector(".card");
         cardElement.classList.remove("flipped");
     }
+
+    // Definir el método toggleFlip() que cambia el estado de volteo de la carta en función de su estado actual.
+    toggleFlip() {
+        this.isFlipped = !this.isFlipped;
+        if (this.isFlipped) {
+            this.#flip();
+        } else {
+            this.#unflip();
+        }
+    }
+    // Implementar el método matches(otherCard) que verifica si la carta actual coincide con otra carta.
+    matches(otherCard) {
+        return this.name === otherCard.name;
+    }
 }
 
+// Se solicita completar la implementación de la clase Board.
 class Board {
     constructor(cards) {
         this.cards = cards;
@@ -74,8 +90,32 @@ class Board {
             this.onCardClick(card);
         }
     }
+
+    // Implementar el método shuffleCards() que mezcla las cartas del tablero. El criterio de mezcla esta dispuesto a elección del estudiante.
+    shuffleCards() {
+        for (let i = this.cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+        }
+    }
+
+    // Implementar el método reset() que reinicia el tablero.
+    reset() {
+        this.shuffleCards();
+        this.flipDownAllCards();
+    }
+
+    // Implementar el método flipDownAllCards() que posiciona todas las cartas en su estado inicial. Es necesario para reiniciar el tablero.
+    flipDownAllCards() {
+        this.cards.forEach((card) => {
+            if (card.isFlipped) {
+                card.toggleFlip();
+            }
+        });
+    }
 }
 
+// Se solicita completar la implementación de la clase MemoryGame.
 class MemoryGame {
     constructor(board, flipDuration = 500) {
         this.board = board;
@@ -90,6 +130,9 @@ class MemoryGame {
         this.flipDuration = flipDuration;
         this.board.onCardClick = this.#handleCardClick.bind(this);
         this.board.reset();
+        // Implementar un contador de movimientos para llevar un registro de los intentos realizados por el jugador.
+        this.movesCount = 0;
+        this.updateMovesCounter();
     }
 
     #handleCardClick(card) {
@@ -98,9 +141,44 @@ class MemoryGame {
             this.flippedCards.push(card);
 
             if (this.flippedCards.length === 2) {
+                // Implementar un contador de movimientos para llevar un registro de los intentos realizados por el jugador.
+                this.movesCount++;
+                this.updateMovesCounter();
                 setTimeout(() => this.checkForMatch(), this.flipDuration);
             }
         }
+    }
+
+    // Implementar el método checkForMatch() que verifica si las cartas volteadas coinciden. 
+    // En caso de coincidir, las cartas deben ser añadidas al conjunto de cartas emparejadas. 
+    // Es fundamental para que el método #handleCardClick() funcione correctamente.
+    checkForMatch() {
+        const [firstCard, secondCard] = this.flippedCards;
+        if (firstCard.matches(secondCard)) {
+            this.matchedCards.push(firstCard, secondCard);
+        } else {
+            setTimeout(() => {
+                firstCard.toggleFlip();
+                secondCard.toggleFlip();
+            }, this.flipDuration);
+        }
+        this.flippedCards = [];
+    }
+
+    // Implementar el método resetGame() que reinicia el juego. Debe emplear otros métodos de la clase MemoryGame para realizar esta tarea.
+    resetGame() {
+        this.board.reset();
+        this.matchedCards = [];
+        this.flippedCards = [];
+        this.movesCount = 0;
+        this.updateMovesCounter();
+    }
+
+    // Implementar cualquier funcionalidad adicional entre las siguientes opciones otorgará puntos adicionales:
+    // Implementar un contador de movimientos para llevar un registro de los intentos realizados por el jugador.
+    updateMovesCounter() {
+        const movesCountElement = document.getElementById("moves-count");
+        movesCountElement.textContent = this.movesCount;
     }
 }
 
@@ -120,7 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
     const board = new Board(cards);
     const memoryGame = new MemoryGame(board, 1000);
-
+    // correccion para el rendericado del html
+    board.render();
     document.getElementById("restart-button").addEventListener("click", () => {
         memoryGame.resetGame();
     });

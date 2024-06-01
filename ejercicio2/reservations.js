@@ -1,6 +1,51 @@
-class Customer {}
+// Definir una clase Customer en el archivo reservations.js que permita representar un cliente.
+class Customer {
+    // La clase debe tener un constructor.
+    constructor(id, name, email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 
-class Reservation {}
+    // Se debe implementar una propiedad computada info que retorne una cadena con el nombre y el correo electrónico del cliente.
+    get info() {
+        return `${this.name} - ${this.email}`;
+    }
+}
+
+// Definir una clase Reservation en el archivo reservations.js que permita representar una reserva.
+class Reservation {
+    // La clase debe tener un constructor.
+    constructor(id, customer, date, guests) {
+        this.id = id;
+        this.customer = customer;
+        this.date = new Date(date);
+        this.guests = guests;
+    }
+
+    // Se debe implementar una propiedad computada info que retorne una cadena con la fecha y hora de la reserva, la información del cliente y el número de comensales.
+    get info() {
+        return `Fecha y hora: ${this.date.toLocaleString()} - Cliente: ${this.customer.info} - Comensales: ${this.guests}`;
+    }
+
+    // Se debe implementar un método estático validate que reciba un objeto con la información de la reserva y retorne true si la información es válida y false en caso contrario.
+    // Si la fecha de la reserva es anterior a la fecha actual y la cantidad de comensales es menor o igual a 0, la reserva no es válida.
+    static validate(reservation) {
+        const now = new Date();
+        const reservationDate = new Date(reservation.date);
+        return !(reservationDate <= now || reservation.guests <= 0);
+    }
+
+    // La consigna determina que el metodo se debe llamar "validate" el cual recibe un objeto, y valida, el metodo esta desarrollado arriba
+    // Agrego este metodo ya que la clase Restaurant utiliza un metodo llamado "validateReservation" no "validate"
+    // con el fin de que el programa funcione, ya que no se permite modificarla, agrego este
+    // si no es acorde, estoy a dispodicion en el chat de la plataforma
+    static validateReservation(date, guests) {
+        const now = new Date();
+        const reservationDate = new Date(date);
+        return !(reservationDate <= now || guests <= 0);
+    }
+}
 
 class Restaurant {
     constructor(name) {
